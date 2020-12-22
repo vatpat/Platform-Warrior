@@ -1,21 +1,20 @@
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Scanner;
 import processing.core.PApplet;
 import processing.core.PImage;
+import java.util.ArrayList;
 
 /**
- * PlatformGame creates and launches the graphics application for the Platform Shooter Game
+ * The PlatformGame class creates and launches the Graphics Application for the Platform Game
  * 
  * @author vatrp
  */
 public class PlatformGame extends PApplet {
   private PImage backgroundImage;
-  // private ArrayList<GameObjects> objects;
+  private ArrayList<GameObject> objects;
+  // GameObject player; //Test 1
 
   /**
-   * Sets the size of the application window
+   * Sets the size of the Application Window
    */
   @Override
   public void settings() {
@@ -28,11 +27,24 @@ public class PlatformGame extends PApplet {
    */
   @Override
   public void setup() {
-    // Set the processing field:
+    // Set the processing field
     GameObject.setProcessing(this);
-    
-    this.getSurface().setTitle("Platform Game");
+
+    // Set title of window
+    this.getSurface().setTitle("Action Platform Game");
+
+    // Load background image
     this.backgroundImage = loadImage("images" + File.separator + "background.png");
+    
+    // Initialize the GameObjects ArrayList
+    this.objects = new ArrayList<GameObject>();
+    
+    
+    // GameObject player = new GameObject("player", 30, 30);
+    // this.objects.add(player);
+    
+    // initialize player
+    // player = new GameObject("player", 30, 30); //Test 1
   }
 
   /**
@@ -41,21 +53,35 @@ public class PlatformGame extends PApplet {
   @Override
   public void draw() {
     // draw background image at (0,0)
-    image(backgroundImage, 0, 0);
+    image(this.backgroundImage, 0, 0);
     
-    // Checkpoint 1:
-    //GameObject gamechar = new GameObject("player", 50, 700);
-    //gamechar.update();
+    /*
+    GameObject object = this.objects.get(0);
+    object.move(1, 1);
+    if(object.isActive()) {
+      object.update();
+    }
+    */
     
-    // Checkpoint 2:
-    // Character c1 = new Character("player",50,700,1);
-    // c1.update();
-    
+    /*
+    // Create and draw a GameObject     Test 1
+    player.move(1, 1);
+    if(player.getXPosition() > 50) {
+      player.deactivate();
+    }
+    if(player.isActive()) {
+      player.update();
+    }
+    */
   }
-
+  
+  public void keyPressed() {
+    // Check which key is pressed, call the appropriate action for each GameObject
+  }
+  
   /**
    * Launches the Graphics Application
-   *
+   * 
    * @param args Input Arguments
    */
   public static void main(String[] args) {

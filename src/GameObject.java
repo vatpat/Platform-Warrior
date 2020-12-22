@@ -3,73 +3,58 @@ import processing.core.PApplet;
 import processing.core.PImage;
 
 /**
- * The GameObject class maintains the creation and usage of objects that will appear in the game.
+ * The GameObject class maintains the creation and usage of objects that will appear in the game
  * 
  * @author vatrp
  */
 public class GameObject {
-  private final String NAME; // Name of the GameObject
-  private PImage image; // Graphical Representation of the GameObject
+  private final String NAME; // The name of the GameObject
+  private PImage image; // Graphical representation of the GameObject
   private int xPosition; // x-coordinate of the GameObject
   private int yPosition; // y-coordinate of the GameObject
-  private static PApplet processing = null;
+  public boolean active; // whether the GameObject is active (whether it should be displayed)
+  private static PApplet processing = null; // Processing field, to be accessed by child classes
 
+  /**
+   * Constructor for a GameObject
+   * 
+   * @param name The identifying name of the GameObject (name of image file)
+   * @param x    Starting x-coordinate of the GameObject
+   * @param y    Starting y-coordinate of the GameObject
+   */
   public GameObject(String name, int x, int y) {
     this.NAME = name;
+    this.image = GameObject.processing.loadImage("images" + File.separator + name + ".png");
     this.xPosition = x;
     this.yPosition = y;
-    this.image = GameObject.processing.loadImage("images" + File.separator + name + ".png");
+    this.active = true;
   }
 
   /**
-   * Returns true if the GameObject's name is equal to the name parameter, false otherwise
+   * Accessor method for the GameObject's x-coordinate
    * 
-   * @param name The name being checked against the GameObject's NAME
-   * @return true if name and NAME are equal, false otherwise
-   */
-  public boolean hasName(String name) {
-    if (this.NAME == null || !this.NAME.equals(name)) {
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * Draws the GameObject at the correct location
-   */
-  public void update() {
-    GameObject.processing.image(this.image, this.xPosition, this.yPosition);
-  }
-
-  /**
-   * Moves the GameObject by the specified distances
-   * 
-   * @param dx The distance to move the GameObject in the horizontal direction (+ vals move right)
-   * @param dy The distance to move the GameObject in the vertical direction (+ vals move up)
-   */
-  public void move(int dx, int dy) {
-    this.xPosition += dx;
-    this.yPosition += dy;
-  }
-
-  /**
-   * Accessor method for the GameObject's x-position
-   * 
-   * @return The x-position of the GameObject
+   * @return The x-coordinate of the GameObject
    */
   public int getXPosition() {
     return this.xPosition;
   }
 
   /**
-   * Accessor method for the GameObject's y-position
+   * Accessor method for the GameObject's y-coordinate
    * 
-   * @return The y-position of the GameObject
+   * @return The y-coordinate of the GameObject
    */
   public int getYPosition() {
     return this.yPosition;
   }
-
+  
+  /*
+  public void move(int dx, int dy) {        //Test 1
+    this.xPosition += dx;
+    this.yPosition += dy;
+  }
+  */
+  
   /**
    * Accessor method for the GameObject's image
    * 
@@ -78,11 +63,33 @@ public class GameObject {
   public PImage getImage() {
     return this.image;
   }
+  
+  /**
+   * Returns whether the GameObject is active
+   * @return True if the GameObject is active, false otherwise
+   */
+  public boolean isActive() {
+    return this.active;
+  }
+  
+  /**
+   * Deactivates the GameObject
+   */
+  public void deactivate() {
+    this.active = false;
+  }
+
+  /**
+   * Draws the GameObject at the current location
+   */
+  public void update() {
+    GameObject.processing.image(this.image, this.xPosition, this.yPosition);
+  }
 
   /**
    * Initializes the processing field
    * 
-   * @param processing The initial processing field
+   * @param processing The processing field
    */
   public static void setProcessing(PApplet processing) {
     GameObject.processing = processing;
@@ -93,7 +100,7 @@ public class GameObject {
    * 
    * @return The static processing field
    */
-  protected static PApplet getProcessing() {
+  public static PApplet getProcessing() {
     return GameObject.processing;
   }
 }
