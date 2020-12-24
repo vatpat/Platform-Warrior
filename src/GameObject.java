@@ -8,7 +8,6 @@ import processing.core.PImage;
  * @author vatrp
  */
 public class GameObject {
-  private final String NAME; // The name of the GameObject
   private PImage image; // Graphical representation of the GameObject
   private int xPosition; // x-coordinate of the GameObject
   private int yPosition; // y-coordinate of the GameObject
@@ -23,7 +22,6 @@ public class GameObject {
    * @param y    Starting y-coordinate of the GameObject
    */
   public GameObject(String name, int x, int y) {
-    this.NAME = name;
     this.image = GameObject.processing.loadImage("images" + File.separator + name + ".png");
     this.xPosition = x;
     this.yPosition = y;
@@ -47,14 +45,7 @@ public class GameObject {
   public int getYPosition() {
     return this.yPosition;
   }
-  
-  /*
-  public void move(int dx, int dy) {        //Test 1
-    this.xPosition += dx;
-    this.yPosition += dy;
-  }
-  */
-  
+
   /**
    * Accessor method for the GameObject's image
    * 
@@ -63,15 +54,16 @@ public class GameObject {
   public PImage getImage() {
     return this.image;
   }
-  
+
   /**
    * Returns whether the GameObject is active
+   * 
    * @return True if the GameObject is active, false otherwise
    */
   public boolean isActive() {
     return this.active;
   }
-  
+
   /**
    * Deactivates the GameObject
    */
@@ -83,7 +75,17 @@ public class GameObject {
    * Draws the GameObject at the current location
    */
   public void update() {
-    GameObject.processing.image(this.image, this.xPosition, this.yPosition);
+    if (this.active) {
+      GameObject.processing.image(this.image, this.xPosition, this.yPosition);
+    }
+  }
+  
+  public void move(int dx, int dy) { // Test 1
+    this.xPosition += dx;
+    this.yPosition += dy;
+  }
+  public void setYPosition(int newY) {
+    this.yPosition = newY;
   }
 
   /**
