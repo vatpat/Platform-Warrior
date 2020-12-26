@@ -41,7 +41,7 @@ public class Platform extends GameObject {
     int figureBottomY = f.getYPosition() + figure.height;
     // If the distance between the top of the Platform and the bottom of the Figure is greater than
     // 5, the Figure is not standing on the Platform
-    if(topSide - figureBottomY > 6 || topSide - figureBottomY < 0) {
+    if(topSide - figureBottomY > 3 || topSide - figureBottomY < 0) {
       return false;
     }
     

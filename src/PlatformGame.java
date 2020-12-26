@@ -1,3 +1,4 @@
+import java.awt.event.MouseEvent;
 import java.io.File;
 import processing.core.PApplet;
 import processing.core.PImage;
@@ -10,25 +11,22 @@ import java.util.ArrayList;
  */
 public class PlatformGame extends PApplet {
   private PImage backgroundImage;
-  private ArrayList<Figure> figures; // ArrayList of Figures to be displayed
+  private Player player; // Reference to the Player's GameObject
+  private ArrayList<Enemy> enemies; // Reference to the List of Enemies that the Player must defeat
   private ArrayList<Platform> platforms; // ArrayList of Platforms to be displayed
-  private boolean[] keys; // Tracks whether 'w', 'a', 's', and 'd' have been pressed
-  Player player; // Test 1
-  Enemy enemy;
-  Projectile fire;
-  Projectile fire2;
+  private boolean[] keys; // Tracks whether 'w', 'a', 's', 'd', and 'f' have been pressed
 
   /**
    * Sets the size of the Application Window
    */
   @Override
   public void settings() {
-    setSize(200, 200);
+    setSize(1000, 1000);
   }
 
   /**
-   * Initializes environment properties, loads background, loads game Figures/enemies, and
-   * initializes instance fields at the program's start
+   * Initializes environment properties, loads background, loads the Player, the Enemies, and the
+   * corresponding Projectiles, and loads the platforms
    */
   @Override
   public void setup() {
@@ -41,31 +39,22 @@ public class PlatformGame extends PApplet {
     // Load background image
     this.backgroundImage = loadImage("images" + File.separator + "background.png");
 
+    // Initialize the Player and its Projectile
+    Projectile playerProjectile = new Projectile("playerProjectile", 30);
+    this.player = new Player("player", 50, 705, 100, playerProjectile, "playerReverse");
+    playerProjectile.setFigure(this.player);
+
+    // Initialize the List of Enemies and their Projectiles
+    this.initializeEnemies();
+
+    // Initialize the List of Platforms
+    this.initializePlatforms();
+
     // Initialize the keys pressed to false
-    keys = new boolean[5];
-    for (int i = 0; i < 5; i++) {
+    keys = new boolean[4];
+    for (int i = 0; i < 4; i++) {
       keys[i] = false;
     }
-
-    // Initialize the Figures ArrayList
-    this.figures = new ArrayList<Figure>();
-    
-    this.platforms = new ArrayList<Platform>();
-    Platform plat = new Platform("platform", 100, 670);
-    this.platforms.add(plat);
-    Platform large = new Platform("largePlatform", 0, 805);
-    this.platforms.add(large);
-
-    // GameObject player = new GameObject("player", 30, 30);
-    // this.objects.add(player);
-
-    // initialize player
-    fire = new Projectile("projectile2", 15);
-    player = new Player("player2", 30, 50, 30, fire, "player2Reverse"); // Test 1
-    fire.setFigure(player);
-    fire2 = new Projectile("projectile2", 15);
-    enemy = new Enemy("player2", 500, 725, 150, fire2, "player2Reverse", 50);
-    fire2.setFigure(enemy);
   }
 
   /**
@@ -73,67 +62,38 @@ public class PlatformGame extends PApplet {
    */
   @Override
   public void draw() {
+    frameRate(75);
     // draw background image at (0,0)
     image(this.backgroundImage, 0, 0);
-
-    if (keys[0] == true) {
-      player.jump();
-    }
-    if (keys[1] == true) {
-      player.faceLeft();
-      player.move(-3, 0);
-    }
-    if (keys[2] == true) {
-      boolean found = false;
-      for(Platform p: this.platforms) {
-        if(p.isStanding(this.player)) {
-          found = true;
-        }
-      }
-      if(!found) {
-        player.move(0, 3);
-      }
-    }
-    if (keys[3] == true) {
-      player.faceRight();
-      player.move(3, 0);
-    }
-    if (keys[4] == true) {
-      fire.fire();
-      keys[4] = false;
-    }
-    if (player.getProjectile().isOver(enemy)) {
-      fire.deactivate();
-      enemy.inflictDamage(player.getProjectile().getDamage());
-    }
-    if (enemy.getProjectile().isOver(player)) {
-      fire2.deactivate();
-      player.inflictDamage(enemy.getProjectile().getDamage());
-    }
     
-    boolean f = false;
-    for(Platform p: this.platforms) {
-      if(p.isStanding(enemy)) {
-        f = true;
-      }
+    // display health
+    textSize(21);
+    fill(153);
+    this.text("Health: " + this.player.getHealth() + " / 100", 215, 194);
+    
+    // If Player is not Active,
+    if (!this.player.isActive()) {
+      textSize(100);
+      this.text("GAME OVER", 50, 500, 100);
+      return;
     }
-    if(!f) {
-      enemy.move(0, 5);
-    }
-    boolean a = false;
-    for(Platform p: this.platforms) {
-      if(p.isStanding(player)) {
-        player.stand();
-        a = true;
-      }
-    }
-    if(!a) {
-      player.move(0, 5);
-    }
-    player.update();
-    enemy.update();
-    for(Platform p: this.platforms) {
-      p.update();
+
+    // draw all of the Platforms
+    this.drawPlatforms();
+
+    // Check if game keys have been pressed:
+    this.updateKeys();
+
+    // Check if any of the Projectiles need to deal damage
+    this.updateProjectiles();
+
+    // Check if any of the Figures are not on Platforms, and apply gravity if they are not
+    this.applyGravity();
+
+    // Update every Figure
+    this.player.update();
+    for (Enemy e : this.enemies) {
+      e.update();
     }
   }
 
@@ -149,14 +109,11 @@ public class PlatformGame extends PApplet {
     if (key == 'a') {
       keys[1] = true; // 'a' was pressed
     }
-    if (key == 's') {
-      keys[2] = true; // 's' was pressed
-    }
     if (key == 'd') {
-      keys[3] = true; // 'd' was pressed
+      keys[2] = true; // 'd' was pressed
     }
     if (key == 'f') {
-      keys[4] = true; // 'f' was pressed - fire
+      keys[3] = true; // 'f' was pressed
     }
   }
 
@@ -165,19 +122,169 @@ public class PlatformGame extends PApplet {
    */
   public void keyReleased() {
     if (key == 'w') {
-      keys[0] = false; // 'w' was pressed
+      keys[0] = false; // 'w' was released
     }
     if (key == 'a') {
-      keys[1] = false; // 'a' was pressed
-    }
-    if (key == 's') {
-      keys[2] = false; // 's' was pressed
+      keys[1] = false; // 'a' was released
     }
     if (key == 'd') {
-      keys[3] = false; // 'd' was pressed
+      keys[2] = false; // 'd' was released
     }
     if (key == 'f') {
-      keys[4] = false; // 'f' was released
+      keys[3] = false; // 'f' was released
+    }
+  }
+
+  /**
+   * Displays all of the Platforms
+   */
+  public void drawPlatforms() {
+    // Call every Platform's update() method, drawing it at its coordinates
+    for (Platform p : this.platforms) {
+      p.update();
+    }
+  }
+
+  /**
+   * Initializes the Enemies in the game, as well as their corresponding Projectiles
+   */
+  public void initializeEnemies() {
+    this.enemies = new ArrayList<Enemy>();
+
+    // First Enemy:
+    Projectile enemy1Projectile = new Projectile("enemyProjectile", 15);
+    Enemy enemy1 = new Enemy("enemy", 500, 735, 100, enemy1Projectile, "enemy", 50);
+    enemy1Projectile.setFigure(enemy1);
+    this.enemies.add(enemy1);
+
+    // Second Enemy:
+    Projectile enemy2Projectile = new Projectile("enemyProjectile", 20);
+    Enemy enemy2 = new Enemy("enemy", 750, 505, 120, enemy2Projectile, "enemy", 50);
+    enemy2Projectile.setFigure(enemy2);
+    this.enemies.add(enemy2);
+
+    // Third Enemy:
+    Projectile enemy3Projectile = new Projectile("enemyProjectile", 25);
+    Enemy enemy3 = new Enemy("enemy", 250, 400, 130, enemy3Projectile, "enemy", 50);
+    enemy3Projectile.setFigure(enemy3);
+    this.enemies.add(enemy3);
+
+    // Fourth Enemy:
+    Projectile enemy4Projectile = new Projectile("enemyProjectile", 35);
+    Enemy enemy4 = new Enemy("enemy", 500, 250, 140, enemy4Projectile, "enemy", 50);
+    enemy4Projectile.setFigure(enemy4);
+    this.enemies.add(enemy4);
+  }
+
+  /**
+   * Initializes the Platforms in the game
+   */
+  public void initializePlatforms() {
+    this.platforms = new ArrayList<Platform>();
+
+    // First Platform - Long Floor Platform
+    Platform p1 = new Platform("largePlatform", 0, 805);
+    this.platforms.add(p1);
+
+    // Second Platform - Above First Enemy
+    Platform p2 = new Platform("platform", 50, 670);
+    this.platforms.add(p2);
+
+    // Third Platform - Holds Second Enemy
+    Platform p3 = new Platform("platform", 550, 590);
+    this.platforms.add(p3);
+
+    // Fourth Platform - Holds Third Enemy
+    Platform p4 = new Platform("platform", 50, 510);
+    this.platforms.add(p4);
+
+    // Fifth Platform - Lead-up to Final Enemy
+    Platform p5 = new Platform("platform", 550, 430);
+    this.platforms.add(p5);
+
+    // Sixth Platform - Final Enemy
+    Platform p6 = new Platform("platform", 280, 350);
+    this.platforms.add(p6);
+  }
+
+  /**
+   * Check if any of the game keys have been pressed, and act accordingly
+   */
+  public void updateKeys() {
+    // if 'w' has been pressed, the Player jumps
+    if (keys[0] == true) {
+      this.player.jump();
+    }
+    // if 'a' has been pressed, the Player moves left
+    if (keys[1] == true) {
+      this.player.moveLeft();
+    }
+    // if 'd' has been pressed, the Player moves right
+    if (keys[2] == true) {
+      this.player.moveRight();
+    }
+    // if 'f' has been pressed, the Player fires its Projectile
+    if (keys[3] == true) {
+      this.player.getProjectile().fire();
+      // Sets the key to false so it dosen't continuously fire
+      keys[3] = false;
+    }
+  }
+
+  /**
+   * Checks if any of the Projectiles need to deal damage
+   */
+  public void updateProjectiles() {
+    // For every enemy, check if its Projectile needs to deal damage to the Player, and check if
+    // the Player's Projectile needs to deal damage to the Enemy
+    for (Enemy e : this.enemies) {
+      // Check the Player's Projectile
+      if (this.player.getProjectile().isOver(e)) {
+        // Deactivate the Player's Projectile and deal damage to the Enemy
+        Projectile p = this.player.getProjectile();
+        p.deactivate();
+        e.inflictDamage(p.getDamage());
+      }
+      // Check the Enemy's Projectile
+      if (e.getProjectile().isOver(this.player)) {
+        Projectile p = e.getProjectile();
+        p.deactivate();
+        this.player.inflictDamage(p.getDamage());
+      }
+    }
+  }
+
+  /**
+   * Applies gravity to every Figure, shifting it down if it is not standing on a Platform
+   */
+  public void applyGravity() {
+    // Check if the Player is on a Platform
+    boolean playerStand = false;
+    for (Platform p : this.platforms) {
+      if (p.isStanding(this.player)) {
+        this.player.stand();
+        playerStand = true;
+        break;
+      }
+    }
+    // If the Player is not standing on a Platform, shift the Player down
+    if (!playerStand) {
+      this.player.unStand();
+      this.player.applyGravity();
+    }
+    // For every Enemy, check if the Enemy is standing on a Platform
+    for (Enemy e : this.enemies) {
+      boolean enemyStand = false;
+      for (Platform p : this.platforms) {
+        if (p.isStanding(e)) {
+          enemyStand = true;
+          break;
+        }
+      }
+      // If the Enemy is not standing on a Platform, shift the Enemy down
+      if (!enemyStand) {
+        e.applyGravity();
+      }
     }
   }
 

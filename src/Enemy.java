@@ -28,6 +28,10 @@ public class Enemy extends Figure {
     this.pace = pace;
     this.netMovement = 0;
     this.movingRight = true;
+    double directionRand = Math.random();
+    if (directionRand <= 0.50) { // Randomize Starting Direction
+      this.movingRight = false;
+    }
     this.increment = this.pace / 25;
   }
 
@@ -36,28 +40,28 @@ public class Enemy extends Figure {
    */
   public void update() {
     super.update();
-    if(this.isActive()) {
+    if (this.isActive()) {
       // If the Enemy is moving right and hasn't reached the max distance, continue moving right
-      if(this.movingRight && this.netMovement < this.pace) {
+      if (this.movingRight && this.netMovement < this.pace) {
         this.move(this.increment, 0);
         this.netMovement += this.increment;
       }
       // If the Enemy has reached or exceeded the max distance facing right, then change to moving
       // left
-      if(this.movingRight && this.netMovement >= this.pace) {
+      if (this.movingRight && this.netMovement >= this.pace) {
         this.movingRight = false;
         this.faceLeft();
         this.getProjectile().fire();
         return;
       }
       // If the enemy is moving left and hasn't reached the max distance, continue moving left
-      if(!this.movingRight && this.netMovement > (-1 * this.pace)) {
+      if (!this.movingRight && this.netMovement > (-1 * this.pace)) {
         this.move(-1 * this.increment, 0);
         this.netMovement -= this.increment;
       }
       // If the Enemy has reached or exceeded the max distance facing left, then change to moving
       // right
-      if(!this.movingRight && this.netMovement <= (-1 * this.pace)) {
+      if (!this.movingRight && this.netMovement <= (-1 * this.pace)) {
         this.movingRight = true;
         this.faceRight();
         this.getProjectile().fire();

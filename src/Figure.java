@@ -82,6 +82,22 @@ public class Figure extends GameObject {
   }
 
   /**
+   * The Figure moves down due to gravity, shifting the Figure's y-coordinate
+   */
+  public void applyGravity() {
+    this.move(0, 5);
+  }
+
+  /**
+   * Returns the current health of the Figure
+   * 
+   * @return The current health of the Figure
+   */
+  public int getHealth() {
+    return this.health;
+  }
+
+  /**
    * Overrides GameObject's update() method to display the Figure facing the correct direction, and
    * displaying the Projectile if it is active at its current location
    */
@@ -93,7 +109,7 @@ public class Figure extends GameObject {
       super.update();
     } else {
       // Otherwise, the Figure is facing left. If it is active, then draw the reverseImage
-      if(this.isActive()) {
+      if (this.isActive()) {
         processing.image(this.reverseImage, this.getXPosition(), this.getYPosition());
       }
     }

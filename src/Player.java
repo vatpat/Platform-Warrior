@@ -33,14 +33,37 @@ public class Player extends Figure {
   }
   
   /**
+   * Indicates that the Player is no longer standing on a Platform
+   */
+  public void unStand() {
+    this.standing = false;
+  }
+  
+  /**
    * The Player jumps, setting toJump so that the y-coordinate of the Player is continuosuly
    * incremented in update()
    */
   public void jump() {
     if(this.standing) {
-      this.standing = false;
+      this.unStand();
       this.toJump += 150;
     }
+  }
+  
+  /**
+   * The Player moves right, shifting the Player's x-coordinate after facing right
+   */
+  public void moveRight() {
+    this.faceRight();
+    this.move(3, 0);
+  }
+  
+  /**
+   * The Player moves left, shifting the Player's x-coordinate after facing left
+   */
+  public void moveLeft() {
+    this.faceLeft();
+    this.move(-3, 0);
   }
   
   /**
