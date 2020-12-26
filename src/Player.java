@@ -6,8 +6,8 @@
  * @author vatrp
  */
 public class Player extends Figure {
-  public int toJump;
-  public boolean standing; // Whether the Player is standing on a Platform
+  private int toJump; // How much the Player has yet to Jump
+  private boolean standing; // Whether the Player is standing on a Platform
   
   /**
    * Constructor for a Player object
@@ -41,17 +41,6 @@ public class Player extends Figure {
       this.standing = false;
       this.toJump += 150;
     }
-    
-    
-    /*
-    // If the Player is mid-jump (toJump > 0) or has not landed on a Platform, then do nothing
-    if(this.toJump > 0 || !this.standing) {
-      return;
-    }
-    // Otherwise, increment toJump
-    this.toJump += 100;
-    this.standing = false;
-    */
   }
   
   /**
@@ -63,11 +52,7 @@ public class Player extends Figure {
     if(this.toJump > 0) {
       this.move(0, -10);
       this.toJump -= 10;
-      System.out.println(toJump);
     }
     super.update();
   }
-  
-  
-
 }

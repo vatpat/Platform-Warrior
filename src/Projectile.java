@@ -12,7 +12,7 @@ public class Projectile {
   private PImage image; // Graphical representation of the Projectile
   private Figure figure; // A reference to the Figure that shoots the Projectile
   private int damage; // The damage that the Projectile deals on impact
-  private int maxDistance; // The maximum distance that the Projectile can travel
+  private final int maxDistance; // The maximum distance that the Projectile can travel
   private int toTravel; // The distance that the Projectile still needs to travel
   private int x; // The x-coordinate of the Projectile
   private int y; // The y-coordinate of the Projectile
@@ -30,7 +30,7 @@ public class Projectile {
     PApplet processing = GameObject.getProcessing();
     this.image = processing.loadImage("images" + File.separator + name + ".png");
     this.damage = dmg;
-    this.maxDistance = 150;
+    this.maxDistance = 200;
     this.toTravel = 0;
     this.active = false;
   }
@@ -106,18 +106,18 @@ public class Projectile {
     if (this.active || !this.figure.isActive()) {
       return;
     }
-
-    PImage charImage = this.figure.getImage();
-    this.facingRight = this.figure.facingRight();
+    // Otherwise, the Figure is active and the Projectile has not been fired yet
+    PImage figureImage = this.figure.getImage();
+    this.facingRight = this.figure.facingRight(); // Projectile faces same direction as the Figure
 
     // If the Figure is facing right, then the Projectile will be shot to the right
     if (this.figure.facingRight()) {
-      this.x = this.figure.getXPosition() + charImage.width;
+      this.x = this.figure.getXPosition() + figureImage.width;
     } else {
       // Otherwise, Projectile will be shot to the left
       this.x = this.figure.getXPosition() - this.image.width;
     }
-    this.y = this.figure.getYPosition() + (charImage.height / 4);
+    this.y = this.figure.getYPosition() + (figureImage.height / 4);
     this.toTravel = this.maxDistance;
     this.active = true;
   }

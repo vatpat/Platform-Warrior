@@ -11,7 +11,7 @@ public class GameObject {
   private PImage image; // Graphical representation of the GameObject
   private int xPosition; // x-coordinate of the GameObject
   private int yPosition; // y-coordinate of the GameObject
-  public boolean active; // whether the GameObject is active (whether it should be displayed)
+  private boolean active; // whether the GameObject is active (whether it should be displayed)
   private static PApplet processing = null; // Processing field, to be accessed by child classes
 
   /**
@@ -47,6 +47,26 @@ public class GameObject {
   }
 
   /**
+   * Moves the GameObject by shifting the x and y coordinates
+   * 
+   * @param dx The change to the x-coordinate
+   * @param dy The change to the y-coordinate
+   */
+  public void move(int dx, int dy) {
+    this.xPosition += dx;
+    this.yPosition += dy;
+  }
+
+  /**
+   * Sets the y-coordinate of the GameObject to a specified value
+   * 
+   * @param newY The value that the y-coordinate will be set to
+   */
+  public void setYPosition(int newY) {
+    this.yPosition = newY;
+  }
+
+  /**
    * Accessor method for the GameObject's image
    * 
    * @return A reference to the GameObject's image
@@ -78,14 +98,6 @@ public class GameObject {
     if (this.active) {
       GameObject.processing.image(this.image, this.xPosition, this.yPosition);
     }
-  }
-  
-  public void move(int dx, int dy) { // Test 1
-    this.xPosition += dx;
-    this.yPosition += dy;
-  }
-  public void setYPosition(int newY) {
-    this.yPosition = newY;
   }
 
   /**

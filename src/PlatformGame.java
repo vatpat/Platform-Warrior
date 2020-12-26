@@ -23,7 +23,7 @@ public class PlatformGame extends PApplet {
    */
   @Override
   public void settings() {
-    size(1000, 1000);
+    setSize(200, 200);
   }
 
   /**
@@ -81,7 +81,7 @@ public class PlatformGame extends PApplet {
     }
     if (keys[1] == true) {
       player.faceLeft();
-      player.move(-2, 0);
+      player.move(-3, 0);
     }
     if (keys[2] == true) {
       boolean found = false;
@@ -91,12 +91,12 @@ public class PlatformGame extends PApplet {
         }
       }
       if(!found) {
-        player.move(0, 2);
+        player.move(0, 3);
       }
     }
     if (keys[3] == true) {
       player.faceRight();
-      player.move(2, 0);
+      player.move(3, 0);
     }
     if (keys[4] == true) {
       fire.fire();

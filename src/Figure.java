@@ -35,7 +35,6 @@ public class Figure extends GameObject {
     PApplet processing = GameObject.getProcessing();
     this.reverseImage = processing.loadImage("images" + File.separator + reverse + ".png");
     this.facingRight = true; // By default, the GameObject will face right
-
   }
 
   /**
@@ -73,10 +72,6 @@ public class Figure extends GameObject {
     this.facingRight = false;
   }
 
-  public int getHealth() {
-    return this.health;
-  }
-
   /**
    * Returns whether the Figure is facing right
    * 
@@ -94,20 +89,20 @@ public class Figure extends GameObject {
     PApplet processing = GameObject.getProcessing();
 
     // If the Figure is facing right, then use GameObject's update()
-    if (this.active) {
-      if (this.facingRight) {
-        super.update();
-      } else {
+    if (this.facingRight) {
+      super.update();
+    } else {
+      // Otherwise, the Figure is facing left. If it is active, then draw the reverseImage
+      if(this.isActive()) {
         processing.image(this.reverseImage, this.getXPosition(), this.getYPosition());
-
       }
     }
     // Check if the Figure's Projectile is active. If it is, then draw it to the appropriate
-    // position
+    // position, and travel a short distance
     if (this.projectile != null && this.projectile.isActive()) {
       Projectile p = this.projectile;
       processing.image(p.getImage(), p.getXPosition(), p.getYPosition());
-      p.travel(5);
+      p.travel(8);
     }
   }
 }
