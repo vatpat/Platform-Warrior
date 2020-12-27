@@ -62,15 +62,16 @@ public class PlatformGame extends PApplet {
    */
   @Override
   public void draw() {
-    frameRate(75);
+    frameRate(65);
+    
     // draw background image at (0,0)
     image(this.backgroundImage, 0, 0);
-    
+
     // display health
     textSize(21);
     fill(153);
     this.text("Health: " + this.player.getHealth() + " / 100", 215, 194);
-    
+
     // If Player is not Active,
     if (!this.player.isActive()) {
       textSize(100);
@@ -216,11 +217,11 @@ public class PlatformGame extends PApplet {
       this.player.jump();
     }
     // if 'a' has been pressed, the Player moves left
-    if (keys[1] == true) {
+    if (keys[1] == true && this.player.getXPosition() > 5) {
       this.player.moveLeft();
     }
     // if 'd' has been pressed, the Player moves right
-    if (keys[2] == true) {
+    if (keys[2] == true && this.player.getXPosition() < 950) {
       this.player.moveRight();
     }
     // if 'f' has been pressed, the Player fires its Projectile
