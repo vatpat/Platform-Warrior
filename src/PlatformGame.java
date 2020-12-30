@@ -63,7 +63,7 @@ public class PlatformGame extends PApplet {
   @Override
   public void draw() {
     frameRate(65);
-    
+
     // draw background image at (0,0)
     image(this.backgroundImage, 0, 0);
 
@@ -76,6 +76,13 @@ public class PlatformGame extends PApplet {
     if (!this.player.isActive()) {
       textSize(100);
       this.text("GAME OVER", 50, 500, 100);
+      return;
+    }
+
+    // If there are no more enemies
+    if (this.enemies.size() == 0) {
+      textSize(100);
+      this.text("YOU WIN!", 50, 500, 100);
       return;
     }
 
@@ -236,6 +243,7 @@ public class PlatformGame extends PApplet {
    * Checks if any of the Projectiles need to deal damage
    */
   public void updateProjectiles() {
+    ArrayList<Enemy> dead = new ArrayList<Enemy>();
     // For every enemy, check if its Projectile needs to deal damage to the Player, and check if
     // the Player's Projectile needs to deal damage to the Enemy
     for (Enemy e : this.enemies) {
@@ -245,6 +253,10 @@ public class PlatformGame extends PApplet {
         Projectile p = this.player.getProjectile();
         p.deactivate();
         e.inflictDamage(p.getDamage());
+        // If the enemy is dead, note that it must be removed
+        if(!e.isActive()) {
+          dead.add(e);
+        } 
       }
       // Check the Enemy's Projectile
       if (e.getProjectile().isOver(this.player)) {
@@ -252,6 +264,10 @@ public class PlatformGame extends PApplet {
         p.deactivate();
         this.player.inflictDamage(p.getDamage());
       }
+    }
+    // Remove all dead enemies
+    for(Enemy e : dead) {
+      this.enemies.remove(e);
     }
   }
 
